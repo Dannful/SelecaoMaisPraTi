@@ -16,6 +16,14 @@ public class Util {
         }
     }
 
+    public static Long parseLongOrNull(String input) {
+        try {
+            return Long.parseLong(input);
+        } catch (final NumberFormatException ignored) {
+            return null;
+        }
+    }
+
     public static Double parseDoubleOrNull(String input) {
         try {
             return Double.parseDouble(input);

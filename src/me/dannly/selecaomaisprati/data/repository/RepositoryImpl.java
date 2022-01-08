@@ -4,7 +4,9 @@ import me.dannly.selecaomaisprati.domain.model.Person;
 import me.dannly.selecaomaisprati.domain.repository.Repository;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class RepositoryImpl implements Repository {
 
@@ -39,7 +41,7 @@ public class RepositoryImpl implements Repository {
     @Override
     public List<Person> get(String name) {
         if (name == null)
-            return List.of();
-        return people.stream().filter(person -> person.getName().equals(name)).toList();
+            return Collections.emptyList();
+        return people.stream().filter(person -> person.getName().equals(name)).collect(Collectors.toList());
     }
 }
