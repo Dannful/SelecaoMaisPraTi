@@ -1,13 +1,11 @@
 package me.dannly.selecaomaisprati.domain.model;
 
-import java.time.LocalDate;
-
 public class Student extends Person {
 
     private final double grade;
 
-    public Student(String nome, LocalDate nascimento, long phone, double grade) {
-        super(nome, nascimento, phone);
+    public Student(String name, long birthDate, long phone, double grade) {
+        super(name, birthDate, phone);
         this.grade = grade;
     }
 

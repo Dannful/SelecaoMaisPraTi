@@ -8,6 +8,7 @@ import me.dannly.selecaomaisprati.presentation.util.Action;
 import me.dannly.selecaomaisprati.presentation.util.Util;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Consumer;
@@ -74,23 +75,23 @@ public class Main {
     private static Student retrieveInputsAndCreateStudent(Student existent) {
         final String keep = existent != null ? "(insira M para manter o valor atual) " : "";
         final String name = Util.scanNext("- Insira o novo nome: " + keep, (s) -> s.trim().isEmpty(), null, () -> scanner.next().trim());
-        final LocalDate birthDate = Util.scanNext("- Insira a nova data de nascimento (dd/MM/aa): " + keep, Objects::isNull, existent != null ? () -> null : null, () -> Util.parseDateOrNull(dateFormatter, scanner.next().trim()));
-        final Long phone = phoneToLong(Util.scanNext("- Insira o novo número de telefone. [+XX XX XXXX-XXXX] " + keep, obj -> obj == null || !Pattern.matches("\\+[0-9]{2} [0-9]{2} [0-9]{4}-[0-9]{4}", obj), existent != null ? () -> null : null, () -> scanner.next().trim()));
+        final LocalDate birthDate = Util.scanNext("- Insira a nova data de nascimento (dd/MM/aaaa): " + keep, Objects::isNull, existent != null ? () -> null : null, () -> Util.parseDateOrNull(dateFormatter, scanner.next().trim()));
+        final Long phone = phoneToLong(Util.scanNext("- Insira o novo número de telefone. (+XX XX XXXX-XXXX) " + keep, obj -> obj == null || ((existent != null && !obj.equalsIgnoreCase("m")) && !Pattern.matches("\\+[0-9]{2} [0-9]{2} [0-9]{4}-[0-9]{4}", obj)), existent != null ? () -> null : null, () -> scanner.next().trim()));
         final Double grade = Util.scanNext("Deseja inserir uma nota final? (de 0 a 10, digite \"n/não\" para omitir) " + keep, Objects::isNull, existent != null ? () -> null : null, () -> {
             final String input = scanner.next().trim();
             final Double retrievedDouble = Util.parseDoubleOrNull(input);
             if (retrievedDouble == null) return input.equalsIgnoreCase("m") ? -2d : -1d;
             return retrievedDouble >= 0 && retrievedDouble <= 10 ? retrievedDouble : null;
         });
-        return new Student(existent != null && name.equalsIgnoreCase("m") ? existent.getName() : name, canKeep(existent, birthDate) ? existent.getBirthDate() : birthDate, canKeep(existent, phone) ? existent.getPhone() : phone, existent != null && grade == -2 ? existent.getGrade() : grade);
+        return new Student(existent != null && name.equalsIgnoreCase("m") ? existent.getName() : name, canKeep(existent, birthDate) ? existent.getBirthDate() : birthDate.atStartOfDay(ZoneId.systemDefault()).toEpochSecond() * 1000, canKeep(existent, phone) ? existent.getPhone() : phone, existent != null && grade == -2 ? existent.getGrade() : grade);
     }
 
     private static void printPersonInformation(Person person) {
         System.out.println(repository.getAll().indexOf(person) + ". " + (person instanceof Student ? "Aluno" : "Pessoa") + " - " + person.getName());
-        System.out.println("  - Data de nascimento: " + person.getBirthDate().format(dateFormatter));
-        System.out.println("  - Data de cadastro: " + person.getRegisterDate().format(dateTimeFormatter));
+        System.out.println("  - Data de nascimento: " + person.formatDate(person.getBirthDate()).format(dateFormatter));
+        System.out.println("  - Data de cadastro: " + person.formatDateTime(person.getRegisterDate()).format(dateTimeFormatter));
         System.out.println("  - Número de telefone: " + longToPhone(person.getPhone()));
-        System.out.println("  - Última vez modificado: " + person.getLastChangedDate().format(dateTimeFormatter));
+        System.out.println("  - Última vez modificado: " + person.formatDateTime(person.getLastChangedDate()).format(dateTimeFormatter));
         if (person instanceof Student) System.out.println("  - Nota final: " + ((Student) person).getGrade());
     }
 
