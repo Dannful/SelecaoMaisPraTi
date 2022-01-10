@@ -76,7 +76,7 @@ public class Main {
         final String keep = existent != null ? "(insira M para manter o valor atual) " : "";
         final String name = Util.scanNext("- Insira o novo nome: " + keep, (s) -> s.trim().isEmpty(), null, () -> scanner.next().trim());
         final LocalDate birthDate = Util.scanNext("- Insira a nova data de nascimento (dd/MM/aaaa): " + keep, Objects::isNull, existent != null ? () -> null : null, () -> Util.parseDateOrNull(dateFormatter, scanner.next().trim()));
-        final Long phone = phoneToLong(Util.scanNext("- Insira o novo número de telefone. (+XX XX XXXX-XXXX) " + keep, obj -> obj == null || ((existent != null && !obj.equalsIgnoreCase("m")) && !Pattern.matches("\\+[0-9]{2} [0-9]{2} [0-9]{4}-[0-9]{4}", obj)), existent != null ? () -> null : null, () -> scanner.next().trim()));
+        final Long phone = phoneToLong(Util.scanNext("- Insira o novo número de telefone. (+XX XX XXXX-XXXX) " + keep, obj -> !Pattern.matches("\\+[0-9]{2} [0-9]{2} [0-9]{4}-[0-9]{4}", obj) && (existent == null || !obj.equalsIgnoreCase("m")), existent != null ? () -> null : null, () -> scanner.next().trim()));
         final Double grade = Util.scanNext("Deseja inserir uma nota final? (de 0 a 10, digite \"n/não\" para omitir) " + keep, Objects::isNull, existent != null ? () -> null : null, () -> {
             final String input = scanner.next().trim();
             final Double retrievedDouble = Util.parseDoubleOrNull(input);
